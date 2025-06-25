@@ -82,6 +82,19 @@ async def login_page(request: Request):
     
     return templates.TemplateResponse("login.html", {"request": request})
 
+# Ruta de dashboard - Panel de administración
+@app.get("/dashboard", response_class=HTMLResponse)
+async def dashboard_page(request: Request):
+    if not templates:
+        return HTMLResponse(content="<h1>Sistema en mantenimiento</h1>", status_code=500)
+    
+    # Verificar si existe el archivo dashboard.html
+    dashboard_path = static_dir / "dashboard.html"
+    if not dashboard_path.exists():
+        return HTMLResponse(content="<h1>Archivo dashboard.html no encontrado</h1>", status_code=404)
+    
+    return templates.TemplateResponse("dashboard.html", {"request": request})
+
 # --- IMPORTACIÓN MANUAL DE ROUTERS ---
 try:
     from app.blueprints.auth.routes import router as auth_router

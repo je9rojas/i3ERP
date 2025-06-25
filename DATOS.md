@@ -53,3 +53,5 @@ python -m scripts.create_admin
 
 email = "admin@erp.com"  
 password = "AdminERP"
+
+pip freeze > requirements.txt
