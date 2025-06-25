@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Request
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, RedirectResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.middleware.cors import CORSMiddleware
@@ -95,6 +95,27 @@ async def dashboard_page(request: Request):
     
     return templates.TemplateResponse("dashboard.html", {"request": request})
 
+# Ruta de logout - Cerrar sesión
+@app.get("/logout", response_class=HTMLResponse)
+async def logout():
+    """Cierra la sesión del usuario (manejo real en cliente)"""
+    return RedirectResponse(url="/login")
+
+# Ruta para favicon
+@app.get("/favicon.ico", include_in_schema=False)
+async def get_favicon():
+    favicon_path = static_dir / "favicon.ico"
+    if favicon_path.exists():
+        return FileResponse(favicon_path)
+    
+    # Devuelve un favicon por defecto si no existe
+    default_favicon = static_assets_dir / "default-favicon.ico"
+    if default_favicon.exists():
+        return FileResponse(default_favicon)
+    
+    # Si no hay ninguno, devuelve un 404 vacío
+    return FileResponse(static_dir / "assets" / "default-favicon.ico", status_code=404)
+
 # --- IMPORTACIÓN MANUAL DE ROUTERS ---
 try:
     from app.blueprints.auth.routes import router as auth_router
@@ -156,4 +177,3 @@ async def print_routes():
     print(f"  - POST http://localhost:8000/api/auth/token")
     print(f"  - POST http://localhost:8000/api/auth/register")
     print(f"  - GET  http://localhost:8000/api/auth/me")
-    print("💡 Recuerda implementar el módulo dashboard cuando lo necesites")
