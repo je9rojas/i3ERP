@@ -18,3 +18,38 @@ docker-compose up --build
 
 
 
+
+
+¿Cómo ejecutar ahora?
+Opción 1: Solo backend (para desarrollo API)
+bash
+# En la terminal del backend
+cd D:\Projects\i3ERP\backend
+uvicorn app.main:app --reload
+Opción 2: Con Docker (backend + frontend)
+bash
+# En la raíz del proyecto
+cd D:\Projects\i3ERP
+docker compose up --build
+Opción 3: Frontend separado (recomendado para desarrollo)
+bash
+# Terminal 1: Backend
+cd backend
+uvicorn app.main:app --reload
+
+# Terminal 2: Frontend
+cd frontend
+npm install  # o yarn install
+npm run dev  # o el comando de tu framework
+
+
+
+
+Para usar el script:
+Ejecuta desde el directorio backend:
+
+bash
+python -m scripts.create_admin
+
+email = "admin@erp.com"  
+password = "AdminERP"

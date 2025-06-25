@@ -1,22 +1,24 @@
-from fastapi import APIRouter, Depends, HTTPException
-from app.blueprints.auth.services import get_current_user
-from app.models.user import User, UserRole
+from fastapi import APIRouter, Depends, HTTPException, status  # Importar Depends
+from motor.motor_asyncio import AsyncIOMotorDatabase
+from app.core.database import get_db
+from app.models.user import User
+from typing import List
 
 router = APIRouter()
 
-@router.get("/me", response_model=User)
-async def read_users_me(current_user: dict = Depends(get_current_user)):
-    return current_user
-
-@router.get("/")
-async def get_all_users(current_user: dict = Depends(get_current_user)):
-    if current_user["role"] not in [UserRole.SUPERADMIN, UserRole.ADMIN]:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="No tiene permisos para realizar esta acción"
-        )
-    
-    users = []
-    async for user in db.users.find():
-        users.append(user)
+@router.get("/", response_model=List[User])
+async def get_users(db: AsyncIOMotorDatabase = Depends(get_db)):
+    """Obtiene todos los usuarios"""
+    users = await db.users.find().to_list(100)
+    for user in users:
+        user["id"] = str(user["_id"])
     return users
+
+@router.get("/{user_id}", response_model=User)
+async def get_user(user_id: str, db: AsyncIOMotorDatabase = Depends(get_db)):
+    """Obtiene un usuario por ID"""
+    user = await db.users.find_one({"_id": user_id})
+    if not user:
+        raise HTTPException(status_code=404, detail="Usuario no encontrado")
+    user["id"] = str(user["_id"])
+    return user

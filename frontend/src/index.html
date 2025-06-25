@@ -3,22 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>pyERP - Sistema de Gestión Empresarial</title>
-    <link rel="stylesheet" href="styles/main.css">
+    <title>i3ERP - Sistema de Gestión</title>
+    <link rel="stylesheet" href="/static/styles/main.css">
 </head>
 <body>
-    <div id="app">
-        <header>
-            <h1>pyERP</h1>
-            <nav id="main-nav"></nav>
-        </header>
-        <main>
-            <section id="content"></section>
-        </main>
-        <footer>
-            <p>Sistema ERP Profesional &copy; ${new Date().getFullYear()}</p>
-        </footer>
-    </div>
-    <script src="scripts/main.js"></script>
+    <header>
+        <div class="logo">i3ERP</div>
+        <nav>
+            <a href="/login" class="btn-login">Iniciar Sesión</a>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero">
+            <h1>{{ company.name }}</h1>
+            <div class="mission-vision">
+                <div class="card">
+                    <h2>Misión</h2>
+                    <p>{{ company.mission }}</p>
+                </div>
+                <div class="card">
+                    <h2>Visión</h2>
+                    <p>{{ company.vision }}</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2023 i3ERP Solutions</p>
+    </footer>
+
+    <script src="/static/scripts/main.js"></script>
 </body>
 </html>

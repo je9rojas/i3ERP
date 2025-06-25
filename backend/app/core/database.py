@@ -1,31 +1,31 @@
 import motor.motor_asyncio
 from dotenv import load_dotenv
 import os
+from beanie import init_beanie
+from app.models.user import User  # Importa el modelo User
 
 load_dotenv()
 
-MONGO_URI = os.getenv("MONGO_URI", "mongodb://localhost:27017")
-client = None
-db = None
+MONGO_URI = os.getenv("MONGO_URI")
+
+# Creamos el cliente de MongoDB
+client = motor.motor_asyncio.AsyncIOMotorClient(MONGO_URI)
+db = client.get_default_database()
 
 async def init_db():
-    global client, db
+    """Inicializa la base de datos y Beanie con los modelos."""
     try:
-        client = motor.motor_asyncio.AsyncIOMotorClient(MONGO_URI)
-        
-        # Obtener el nombre de la base de datos desde la URI
-        if "?" in MONGO_URI:
-            db_name = MONGO_URI.split("/")[-1].split("?")[0]
-        else:
-            db_name = MONGO_URI.split("/")[-1]
-        
-        db = client[db_name]
-        print(f"Conexión a MongoDB establecida. Base de datos: {db_name}")
-        
-        # Verificar la conexión
-        await db.command("ping")
-        print("Ping a MongoDB exitoso")
+        # Inicializamos Beanie con los modelos
+        await init_beanie(
+            database=db,
+            document_models=[User]  # Añade aquí todos tus modelos
+        )
+        print("✅ MongoDB conectado exitosamente y Beanie inicializado")
         return db
     except Exception as e:
-        print(f"Error al conectar a MongoDB: {e}")
+        print(f"❌ Error conectando a MongoDB: {e}")
         raise
+
+async def get_db():
+    """Obtiene la instancia de la base de datos"""
+    return db

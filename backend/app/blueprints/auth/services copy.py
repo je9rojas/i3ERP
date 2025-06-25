@@ -1,5 +1,6 @@
 from fastapi import Depends, HTTPException, status
-from app.core.security import verify_password, create_access_token, decode_token, oauth2_scheme
+from app.models.user import User
+from app.core.security import get_password_hash, verify_password, create_access_token, decode_token, oauth2_scheme
 from motor.motor_asyncio import AsyncIOMotorDatabase
 from app.core.database import get_db
 from typing import Dict, Optional
@@ -7,42 +8,56 @@ from jose import JWTError
 import logging
 import traceback
 
+# Configurar logger
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
 
 async def authenticate_user(db: AsyncIOMotorDatabase, email: str, password: str) -> Optional[Dict]:
     """Autentica un usuario con email y contraseña"""
     try:
-        logger.debug(f"🔍 Buscando usuario: {email}")
+        logger.debug(f"🔍 Buscando usuario en DB: {email}")
         user_data = await db.users.find_one({"email": email})
+        
         if not user_data:
             logger.warning(f"⚠️ Usuario no encontrado: {email}")
             return None
         
-        logger.debug(f"✅ Usuario encontrado: {user_data}")
+        logger.debug(f"✅ Usuario encontrado en DB. Datos: {user_data}")
         
-        # Verificar si el documento tiene los campos necesarios
-        required_fields = ["email", "full_name", "hashed_password"]
-        for field in required_fields:
-            if field not in user_data:
-                logger.error(f"❌ Campo faltante en documento de usuario: {field}")
-                logger.debug(f"Documento completo: {user_data}")
-                raise HTTPException(
-                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                    detail=f"Estructura de usuario inválida en la base de datos: falta {field}"
-                )
+        # Convertir a objeto User para verificar contraseña
+        try:
+            logger.debug("🔄 Creando objeto User desde datos de DB...")
+            user = User(
+                email=user_data["email"],
+                full_name=user_data["full_name"],
+                role=user_data["role"],
+                hashed_password=user_data["hashed_password"]
+            )
+            logger.debug("✅ Objeto User creado correctamente")
+        except KeyError as e:
+            logger.error(f"❌ Falta campo requerido en documento de usuario: {str(e)}")
+            logger.debug(f"Documento completo: {user_data}")
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"Estructura de usuario inválida en la base de datos"
+            )
         
-        # Verificar contraseña directamente con el hash de la base de datos
         logger.debug("🔒 Verificando contraseña...")
-        if not verify_password(password, user_data["hashed_password"]):
-            logger.warning("❌ Contraseña incorrecta")
+        if not verify_password(password, user.hashed_password):
+            logger.warning(f"❌ Contraseña incorrecta para: {email}")
             return None
         
+        logger.info(f"✅ Usuario autenticado: {email}")
         return user_data
+    except HTTPException:
+        # Re-lanzar excepciones HTTP que ya manejamos
+        raise
     except Exception as e:
-        logger.exception(f"🔥 Error en autenticación: {str(e)}")
+        logger.error(f"🔥 Error crítico en autenticación: {str(e)}")
+        logger.debug(f"Stack trace: {traceback.format_exc()}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Error de autenticación: {str(e)}"
+            detail=f"Error interno durante la autenticación"
         )
 
 async def get_current_active_user(
@@ -57,7 +72,9 @@ async def get_current_active_user(
     )
     
     try:
+        logger.debug(f"🔍 Validando token JWT: {token[:30]}...")
         payload = decode_token(token)
+        
         if payload is None:
             logger.warning("❌ Token inválido: decodificación fallida")
             raise credentials_exception

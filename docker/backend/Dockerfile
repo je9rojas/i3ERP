@@ -9,8 +9,11 @@ RUN apt-get update && apt-get install -y gcc
 COPY ./backend/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copiar toda la aplicación backend
+# Copiar la aplicación backend
 COPY ./backend .
+
+# Copiar el frontend para archivos estáticos
+COPY ./frontend/src /frontend/src
 
 # Puerto expuesto
 EXPOSE 8000
