@@ -1,0 +1,13 @@
+/* Importar todos los componentes */
+@import "base/_reset.css";
+@import "base/_variables.css";
+@import "base/_typography.css";
+
+@import "components/_buttons.css";
+@import "components/_cards.css";
+@import "components/_forms.css";
+@import "components/_tables.css";
+
+@import "layouts/_dashboard.css";
+@import "layouts/_auth.css";
+@import "layouts/_sidebar.css";

@@ -1,0 +1,61 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Iniciar Sesión | i3ERP{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="/styles/main.css">
+<link rel="stylesheet" href="/styles/pages/auth.css">
+{% endblock %}
+
+{% block content %}
+<div class="auth-page py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6 col-lg-5">
+                <div class="auth-card card shadow-lg">
+                    <div class="card-body p-4">
+                        <div class="text-center mb-4">
+                            <i class="fas fa-lock fa-3x text-primary mb-3"></i>
+                            <h1 class="h4 mb-0">Iniciar Sesión</h1>
+                            <p class="text-muted">Ingresa tus credenciales para acceder</p>
+                        </div>
+                        
+                        <form id="loginForm">
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Correo Electrónico</label>
+                                <input type="email" class="form-control form-control-lg" id="email" required>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="password" class="form-label">Contraseña</label>
+                                <input type="password" class="form-control form-control-lg" id="password" required>
+                                <div class="form-text text-end">
+                                    <a href="#" class="text-decoration-none">¿Olvidaste tu contraseña?</a>
+                                </div>
+                            </div>
+                            
+                            <div class="d-grid mb-3">
+                                <button type="submit" class="btn btn-primary btn-lg">
+                                    <i class="fas fa-sign-in-alt me-2"></i>Ingresar
+                                </button>
+                            </div>
+                            
+                            <div class="text-center">
+                                <p class="mb-0">¿No tienes cuenta? <a href="#" class="text-decoration-none">Regístrate</a></p>
+                            </div>
+                        </form>
+                        
+                        <div id="errorMessage" class="alert alert-danger mt-4 d-none"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="/scripts/core/auth.js"></script>
+<script src="/scripts/modules/auth/auth.js"></script>
+<script src="/scripts/app.js"></script>
+{% endblock %}

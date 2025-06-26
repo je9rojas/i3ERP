@@ -1,0 +1,54 @@
+/* Estilos globales */
+body {
+    background-color: #f8f9fa;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Estilos para la página de bienvenida */
+.hero-section {
+    background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+    color: white;
+    padding: 5rem 0;
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.feature-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    height: 100%;
+}
+
+.feature-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+
+/* Estilos para la página de dashboard */
+.dashboard-container {
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+/* Estilos para la página de login */
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 70vh;
+}
+
+.login-card {
+    width: 100%;
+    max-width: 400px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    border: none;
+}
+
+/* Utilidades */
+.shadow-soft {
+    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+}
+
+.rounded-lg {
+    border-radius: 1rem;
+}

@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Request
-from fastapi.responses import HTMLResponse, RedirectResponse, FileResponse
+from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.middleware.cors import CORSMiddleware
@@ -21,13 +21,13 @@ class StaticCacheMiddleware(BaseHTTPMiddleware):
         response = await call_next(request)
         
         # Aplicar políticas de caché solo a archivos estáticos
-        if request.url.path.startswith(("/static", "/assets")):
+        if request.url.path.startswith(("/public", "/assets", "/styles", "/scripts")):
             # Archivos JS/CSS - 1 año
-            if any(request.url.path.endswith(ext) for ext in ['.js', '.css']):
+            if any(request.url.path.endswith(ext) for ext in ['.js', '.css', '.scss']):
                 response.headers["Cache-Control"] = "public, max-age=31536000"
             
             # Imágenes - 1 año
-            elif any(request.url.path.endswith(ext) for ext in ['.png', '.jpg', '.jpeg', '.gif', '.ico', '.webp']):
+            elif any(request.url.path.endswith(ext) for ext in ['.png', '.jpg', '.jpeg', '.gif', '.ico', '.webp', '.svg']):
                 response.headers["Cache-Control"] = "public, max-age=31536000"
             
             # HTML - no cache
@@ -50,49 +50,84 @@ app.add_middleware(StaticCacheMiddleware)
 
 # Obtener la ruta base del proyecto
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
+FRONTEND_DIR = BASE_DIR / "frontend"
 
-# Configuración para archivos estáticos (CSS, JS, imágenes)
-static_dir = BASE_DIR / "frontend" / "src"
-static_assets_dir = BASE_DIR / "frontend" / "src" / "assets"
+# Configuración de directorios profesional
+public_dir = FRONTEND_DIR / "public"            # Archivos públicos
+assets_dir = FRONTEND_DIR / "src" / "assets"    # Recursos (imágenes, fuentes)
+styles_dir = FRONTEND_DIR / "src" / "styles"    # Hojas de estilo
+scripts_dir = FRONTEND_DIR / "src" / "scripts"  # JavaScript
+templates_dir = FRONTEND_DIR / "src" / "templates"  # Plantillas
 
 # Crear directorios si no existen (solo para desarrollo)
-os.makedirs(static_dir, exist_ok=True)
-os.makedirs(static_assets_dir, exist_ok=True)
+os.makedirs(public_dir, exist_ok=True)
+os.makedirs(assets_dir, exist_ok=True)
+os.makedirs(styles_dir, exist_ok=True)
+os.makedirs(scripts_dir, exist_ok=True)
+os.makedirs(templates_dir, exist_ok=True)
 
-# Montar archivos estáticos
-app.mount("/static", StaticFiles(directory=str(static_dir)), name="static")
-app.mount("/assets", StaticFiles(directory=str(static_assets_dir)), name="assets")
+# Montar archivos estáticos con rutas específicas
+app.mount("/public", StaticFiles(directory=str(public_dir)), name="public")
+app.mount("/assets", StaticFiles(directory=str(assets_dir)), name="assets")
+app.mount("/styles", StaticFiles(directory=str(styles_dir)), name="styles")
+app.mount("/scripts", StaticFiles(directory=str(scripts_dir)), name="scripts")
 
-print(f"✅ Archivos estáticos montados desde: {static_dir}")
+print(f"✅ Archivos públicos montados desde: {public_dir}")
+print(f"✅ Assets montados desde: {assets_dir}")
+print(f"✅ Estilos montados desde: {styles_dir}")
+print(f"✅ Scripts montados desde: {scripts_dir}")
 
-# Configuración de templates - Usando el directorio frontend/src
-templates_dir = static_dir
+# Configuración de templates
 try:
     templates = Jinja2Templates(directory=str(templates_dir))
+    
+    # Verificar existencia de plantillas críticas
+    required_templates = [
+        "layouts/base.html",
+        "layouts/auth.html",
+        "layouts/app.html",
+        "pages/auth/login.html",
+        "pages/dashboard/index.html"
+    ]
+    
+    for template in required_templates:
+        template_path = templates_dir / template
+        if not template_path.exists():
+            print(f"⚠️ ERROR CRÍTICO: Plantilla {template} no encontrada en {template_path}")
+        else:
+            print(f"✓ Plantilla encontrada: {template}")
+    
     print(f"✅ Motor de plantillas Jinja2 configurado correctamente en: {templates_dir}")
+    
 except Exception as e:
     print(f"❌ Error configurando plantillas: {e}")
+    print(f"Ruta de templates: {templates_dir}")
+    print(f"¿Existe el directorio? {os.path.exists(templates_dir)}")
     templates = None
 
 # Ruta principal - Página de inicio
 @app.get("/", response_class=HTMLResponse)
-async def read_root(request: Request):
+async def home(request: Request):
     if not templates:
         return HTMLResponse(content="<h1>Sistema en mantenimiento</h1>", status_code=500)
     
-    # Verificar si existe el archivo index.html
-    index_path = static_dir / "index.html"
-    if not index_path.exists():
-        return HTMLResponse(content="<h1>Archivo index.html no encontrado</h1>", status_code=404)
-    
-    return templates.TemplateResponse("index.html", {
-        "request": request,
-        "company": {
-            "name": "i3ERP Solutions",
-            "mission": "Transformar negocios con tecnología innovadora",
-            "vision": "Líderes en soluciones ERP para PyMEs"
+    try:
+        context = {
+            "request": request,
+            "company": {
+                "name": "i3ERP Solutions",
+                "mission": "Transformar negocios con tecnología innovadora",
+                "vision": "Líderes en soluciones ERP para PyMEs"
+            },
+            "static_path": "/styles",
+            "scripts_path": "/scripts",
+            "assets_path": "/assets"
         }
-    })
+        return templates.TemplateResponse("pages/dashboard/index.html", context)
+    except Exception as e:
+        print(f"❌ Error cargando la página de inicio (dashboard): {e}")
+        traceback.print_exc()
+        return HTMLResponse(content=f"<h1>Error interno: {str(e)}</h1>", status_code=500)
 
 # Ruta de login - Interfaz de autenticación
 @app.get("/login", response_class=HTMLResponse)
@@ -100,12 +135,31 @@ async def login_page(request: Request):
     if not templates:
         return HTMLResponse(content="<h1>Sistema en mantenimiento</h1>", status_code=500)
     
-    # Verificar si existe el archivo login.html
-    login_path = static_dir / "login.html"
-    if not login_path.exists():
-        return HTMLResponse(content="<h1>Archivo login.html no encontrado</h1>", status_code=404)
-    
-    return templates.TemplateResponse("login.html", {"request": request})
+    try:
+        # Verificar existencia de recursos estáticos
+        css_path = styles_dir / "pages" / "auth.css"
+        js_path = scripts_dir / "modules" / "auth" / "auth.js"
+        auth_service_path = scripts_dir / "core" / "auth.js"
+        
+        if not css_path.exists():
+            print(f"⚠️ Advertencia: Archivo CSS no encontrado: {css_path}")
+        if not js_path.exists():
+            print(f"⚠️ Advertencia: Archivo JS no encontrado: {js_path}")
+        if not auth_service_path.exists():
+            print(f"⚠️ Advertencia: Archivo JS no encontrado: {auth_service_path}")
+        
+        context = {
+            "request": request,
+            "static_path": "/styles",
+            "scripts_path": "/scripts",
+            "assets_path": "/assets"
+        }
+        
+        return templates.TemplateResponse("pages/auth/login.html", context)
+    except Exception as e:
+        print(f"❌ Error cargando login.html: {e}")
+        traceback.print_exc()
+        return HTMLResponse(content=f"<h1>Error interno: {str(e)}</h1>", status_code=500)
 
 # Ruta de dashboard - Panel de administración
 @app.get("/dashboard", response_class=HTMLResponse)
@@ -113,48 +167,25 @@ async def dashboard_page(request: Request):
     if not templates:
         return HTMLResponse(content="<h1>Sistema en mantenimiento</h1>", status_code=500)
     
-    # Verificar si existe el archivo dashboard.html
-    dashboard_path = static_dir / "dashboard.html"
-    if not dashboard_path.exists():
-        return HTMLResponse(content="<h1>Archivo dashboard.html no encontrado</h1>", status_code=404)
-    
-    return templates.TemplateResponse("dashboard.html", {"request": request})
+    try:
+        context = {
+            "request": request,
+            "static_path": "/styles",
+            "scripts_path": "/scripts",
+            "assets_path": "/assets"
+        }
+        
+        return templates.TemplateResponse("pages/dashboard/index.html", context)
+    except Exception as e:
+        print(f"❌ Error cargando dashboard.html: {e}")
+        traceback.print_exc()
+        return HTMLResponse(content=f"<h1>Error interno: {str(e)}</h1>", status_code=500)
 
 # Ruta de logout - Cerrar sesión
 @app.get("/logout", response_class=HTMLResponse)
 async def logout():
     """Cierra la sesión del usuario (manejo real en cliente)"""
     return RedirectResponse(url="/login")
-
-# Ruta para favicon - SOLUCIÓN PROFESIONAL
-@app.get("/favicon.ico", include_in_schema=False)
-async def get_favicon():
-    """
-    Maneja las solicitudes de favicon de manera eficiente.
-    - Primero busca en la ubicación estándar (assets/favicon.ico)
-    - Si no existe, devuelve un favicon vacío en memoria
-    - Configura cabeceras de caché adecuadas
-    """
-    # Ruta correcta del favicon
-    favicon_path = static_assets_dir / "favicon.ico"
-    
-    # Opción 1: Favicon existe - devolver con caché
-    if favicon_path.exists():
-        return FileResponse(
-            favicon_path,
-            headers={"Cache-Control": "public, max-age=31536000"}  # 1 año
-        )
-    
-    # Opción 2: Favicon no existe - devolver ícono vacío en memoria
-    from fastapi.responses import Response
-    return Response(
-        content=b"",  # Contenido vacío
-        media_type="image/x-icon",
-        headers={
-            "Cache-Control": "public, max-age=3600",  # 1 hora de caché
-            "X-Content-Type-Options": "nosniff"
-        }
-    )
 
 # --- IMPORTACIÓN MANUAL DE ROUTERS ---
 try:

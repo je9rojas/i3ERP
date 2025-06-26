@@ -1,0 +1,45 @@
+/* frontend/src/styles/pages/auth.css */
+.auth-page {
+    background-color: #f8f9fa;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+}
+
+.auth-card {
+    border-radius: 10px;
+    overflow: hidden;
+    border: none;
+}
+
+.auth-card .card-body {
+    padding: 2rem;
+}
+
+.auth-card .form-control-lg {
+    padding: 12px 15px;
+    font-size: 1rem;
+}
+
+.auth-card .btn-lg {
+    padding: 12px;
+    font-size: 1.1rem;
+}
+
+.auth-card .text-muted {
+    color: #6c757d;
+    font-size: 0.9rem;
+}
+
+.auth-card .fa-lock {
+    color: #4361ee;
+}
+
+.auth-card .form-text a {
+    color: #4361ee;
+    font-size: 0.85rem;
+}
+
+.auth-card .alert {
+    margin-top: 1.5rem;
+}

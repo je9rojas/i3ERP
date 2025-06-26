@@ -59,3 +59,6 @@ pip freeze > requirements.txt
 
 
 New-Item -Path "frontend/src/favicon.ico" -ItemType File
+
+<link rel="stylesheet" href="/static/css/styles.css">
+<script src="/static/js/app.js"></script>

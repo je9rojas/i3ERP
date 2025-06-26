@@ -1,0 +1,31 @@
+{% extends "layouts/app.html" %}
+
+{% block title %}Dashboard | i3ERP{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="/styles/main.css">
+<link rel="stylesheet" href="/styles/pages/dashboard.css">
+{% endblock %}
+
+{% block content %}
+<main>
+    <section class="hero">
+        <h1>i3ERP Solutions</h1>
+        <div class="mission-vision">
+            <div class="card">
+                <h2>Misión</h2>
+                <p>Proporcionar soluciones ERP de clase mundial para empresas de todos los tamaños.</p>
+            </div>
+            <div class="card">
+                <h2>Visión</h2>
+                <p>Ser el ERP más innovador y confiable del mercado.</p>
+            </div>
+        </div>
+    </section>
+</main>
+{% endblock %}
+
+{% block scripts %}
+<script src="/scripts/app.js"></script>
+<script src="/scripts/modules/dashboard/dashboard.js"></script>
+{% endblock %}

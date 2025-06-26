@@ -33,11 +33,13 @@ document.addEventListener('DOMContentLoaded', async () => {
                     const mainElement = document.querySelector('main');
                     if (mainElement) {
                         mainElement.innerHTML = `
-                            <div class="user-welcome">
-                                <h2>Bienvenido, ${userData.full_name}</h2>
-                                <p>Rol: ${userData.role}</p>
-                                <p>Email: ${userData.email}</p>
-                                <button id="logoutBtn" class="logout-btn">Cerrar Sesión</button>
+                            <div class="user-welcome text-center p-5">
+                                <h2 class="mb-3">Bienvenido, ${userData.full_name}</h2>
+                                <div class="user-details bg-light p-4 rounded shadow-sm">
+                                    <p class="mb-1"><strong>Rol:</strong> ${userData.role}</p>
+                                    <p class="mb-1"><strong>Email:</strong> ${userData.email}</p>
+                                    <button id="logoutBtn" class="btn btn-primary mt-3">Cerrar Sesión</button>
+                                </div>
                             </div>
                         `;
                         
@@ -47,6 +49,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                             window.location.href = '/';
                         });
                     }
+                } else {
+                    console.warn("[Main] Error obteniendo datos de usuario");
+                    // Limpiar token inválido
+                    localStorage.removeItem('auth_token');
                 }
             } catch (error) {
                 console.error('[Main] Error cargando datos de usuario:', error);
