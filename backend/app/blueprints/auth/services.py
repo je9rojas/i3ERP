@@ -1,7 +1,7 @@
 from fastapi import Depends, HTTPException, status
-from app.core.security import verify_password, create_access_token, decode_token, oauth2_scheme
 from motor.motor_asyncio import AsyncIOMotorDatabase
 from app.core.database import get_db
+from app.core.security import verify_password, oauth2_scheme, decode_token
 from typing import Dict, Optional
 from jose import JWTError
 import logging
@@ -10,7 +10,6 @@ import traceback
 logger = logging.getLogger(__name__)
 
 async def authenticate_user(db: AsyncIOMotorDatabase, email: str, password: str) -> Optional[Dict]:
-    """Autentica un usuario con email y contraseña"""
     try:
         logger.debug(f"🔍 Buscando usuario: {email}")
         user_data = await db.users.find_one({"email": email})
@@ -18,78 +17,66 @@ async def authenticate_user(db: AsyncIOMotorDatabase, email: str, password: str)
             logger.warning(f"⚠️ Usuario no encontrado: {email}")
             return None
         
-        logger.debug(f"✅ Usuario encontrado: {user_data}")
+        # Verificar campos críticos
+        required_fields = ["email", "full_name", "hashed_password", "role"]
+        missing = [field for field in required_fields if field not in user_data]
         
-        # Verificar si el documento tiene los campos necesarios
-        required_fields = ["email", "full_name", "hashed_password"]
-        for field in required_fields:
-            if field not in user_data:
-                logger.error(f"❌ Campo faltante en documento de usuario: {field}")
-                logger.debug(f"Documento completo: {user_data}")
-                raise HTTPException(
-                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                    detail=f"Estructura de usuario inválida en la base de datos: falta {field}"
-                )
+        if missing:
+            logger.error(f"❌ Campos faltantes: {', '.join(missing)}")
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Estructura de usuario inválida en la base de datos"
+            )
         
-        # Verificar contraseña directamente con el hash de la base de datos
-        logger.debug("🔒 Verificando contraseña...")
+        # Verificar contraseña
         if not verify_password(password, user_data["hashed_password"]):
-            logger.warning("❌ Contraseña incorrecta")
             return None
         
-        return user_data
+        # Preparar datos de respuesta
+        return {
+            "_id": user_data["_id"],
+            "email": user_data["email"],
+            "full_name": user_data["full_name"],
+            "role": user_data["role"]
+        }
+        
     except Exception as e:
-        logger.exception(f"🔥 Error en autenticación: {str(e)}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Error de autenticación: {str(e)}"
-        )
+        logger.error(f"🔥 Error de autenticación: {str(e)}\n{traceback.format_exc()}")
+        raise
 
 async def get_current_active_user(
     token: str = Depends(oauth2_scheme),
     db: AsyncIOMotorDatabase = Depends(get_db)
 ) -> Dict:
-    """Obtiene el usuario actual basado en el token JWT"""
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="No se pudieron validar las credenciales",
+        detail="Credenciales inválidas",
         headers={"WWW-Authenticate": "Bearer"},
     )
     
     try:
         payload = decode_token(token)
-        if payload is None:
-            logger.warning("❌ Token inválido: decodificación fallida")
+        if not payload:
             raise credentials_exception
         
-        email: str = payload.get("sub")
-        if email is None:
-            logger.warning("❌ Token inválido: falta campo 'sub'")
+        email = payload.get("sub")
+        if not email:
             raise credentials_exception
         
-        logger.debug(f"✅ Token válido. Buscando usuario: {email}")
         user_data = await db.users.find_one({"email": email})
-        
-        if user_data is None:
-            logger.warning(f"❌ Usuario no encontrado en DB: {email}")
+        if not user_data:
             raise credentials_exception
         
-        logger.debug(f"✅ Usuario encontrado: {email}")
-        
-        # Remover la contraseña hasheada antes de devolver
-        if 'hashed_password' in user_data:
-            del user_data['hashed_password']
-        
-        # Convertir ObjectId a string
+        # Limpiar datos sensibles
+        user_data.pop("hashed_password", None)
         user_data["_id"] = str(user_data["_id"])
         
         return user_data
-    except JWTError as e:
-        logger.error(f"❌ Error JWT: {str(e)}")
+        
+    except JWTError:
         raise credentials_exception
     except Exception as e:
-        logger.error(f"🔥 Error inesperado al validar token: {str(e)}")
-        logger.debug(f"Stack trace: {traceback.format_exc()}")
+        logger.error(f"🔥 Error validando token: {str(e)}\n{traceback.format_exc()}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Error interno al validar credenciales"

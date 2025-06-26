@@ -12,7 +12,8 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <!-- Font Awesome para iconos -->
-    <link rel="stylesheet" href="/static/assets/font-awesome/css/all.min.css">
+    <!-- Con esto: -->
+     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
         :root {
@@ -309,7 +310,7 @@
                     <div class="card bg-primary-light" id="metric-sales">
                         <div class="card-body metric-card">
                             <i class="fas fa-shopping-cart"></i>
-                            <div class="number">142</div>
+                            <div class="number"><span id="total-sales-value">142</span></div>
                             <div class="title">Ventas Hoy</div>
                         </div>
                     </div>
@@ -318,7 +319,7 @@
                     <div class="card bg-success-light" id="metric-revenue">
                         <div class="card-body metric-card">
                             <i class="fas fa-dollar-sign"></i>
-                            <div class="number">$24,580</div>
+                            <div class="number"><span id="revenue-today-value">$24,580</span></div>
                             <div class="title">Ingresos Hoy</div>
                         </div>
                     </div>
@@ -327,7 +328,7 @@
                     <div class="card bg-warning-light" id="metric-low-stock">
                         <div class="card-body metric-card">
                             <i class="fas fa-exclamation-triangle"></i>
-                            <div class="number">8</div>
+                            <div class="number"><span id="low-stock-value">8</span></div>
                             <div class="title">Productos Bajo Stock</div>
                         </div>
                     </div>
@@ -336,7 +337,7 @@
                     <div class="card bg-danger-light" id="metric-active-users">
                         <div class="card-body metric-card">
                             <i class="fas fa-users"></i>
-                            <div class="number">42</div>
+                            <div class="number"><span id="active-users-value">42</span></div>
                             <div class="title">Usuarios Activos</div>
                         </div>
                     </div>
@@ -543,6 +544,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
     <!-- Script del dashboard -->
-    <script src="/static/scripts/dashboard.js"></script>
+     <script type="module" src="/static/scripts/auth.js"></script>
+     <script type="module" src="/static/scripts/dashboard.js"></script>
 </body>
 </html>

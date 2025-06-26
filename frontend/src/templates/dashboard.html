@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block title %}Panel de Administración - i3ERP{% endblock %}
+
+{% block extra_css %}
+    <!-- Chart.js para gráficos -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="/static/css/layouts/dashboard.css">
+{% endblock %}
+
+{% block content %}
+    {% include "partials/dashboard_navbar.html" %}
+    {% include "partials/dashboard_sidebar.html" %}
+    {% include "partials/dashboard_main.html" %}
+{% endblock %}
+
+{% block extra_js %}
+    <script type="module" src="/static/js/pages/dashboard.js"></script>
+{% endblock %}

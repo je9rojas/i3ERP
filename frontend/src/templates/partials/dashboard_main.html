@@ -1,0 +1,248 @@
+<!-- Contenido principal -->
+<div class="main-content">
+    <div class="container-fluid">
+        <!-- Encabezado -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="h3 mb-0">Panel de Administración</h1>
+            <div>
+                <button class="btn btn-primary">
+                    <i class="fas fa-plus me-1"></i> Nuevo Reporte
+                </button>
+            </div>
+        </div>
+        
+        <!-- Métricas -->
+        <div class="row">
+            <div class="col-xl-3 col-md-6">
+                <div class="card bg-primary-light" id="metric-sales">
+                    <div class="card-body metric-card">
+                        <i class="fas fa-shopping-cart"></i>
+                        <div class="number"><span id="total-sales-value">142</span></div>
+                        <div class="title">Ventas Hoy</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-md-6">
+                <div class="card bg-success-light" id="metric-revenue">
+                    <div class="card-body metric-card">
+                        <i class="fas fa-dollar-sign"></i>
+                        <div class="number"><span id="revenue-today-value">$24,580</span></div>
+                        <div class="title">Ingresos Hoy</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-md-6">
+                <div class="card bg-warning-light" id="metric-low-stock">
+                    <div class="card-body metric-card">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <div class="number"><span id="low-stock-value">8</span></div>
+                        <div class="title">Productos Bajo Stock</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-md-6">
+                <div class="card bg-danger-light" id="metric-active-users">
+                    <div class="card-body metric-card">
+                        <i class="fas fa-users"></i>
+                        <div class="number"><span id="active-users-value">42</span></div>
+                        <div class="title">Usuarios Activos</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Gráficos y tablas -->
+        <div class="row mt-4">
+            <!-- Gráfico de ventas -->
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">Ventas Mensuales</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="salesChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Productos más vendidos -->
+            <div class="col-lg-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">Productos Populares</h5>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-group list-group-flush" id="top-products-list">
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-0">Laptop HP EliteBook</h6>
+                                    <small class="text-muted">Categoría: Computadoras</small>
+                                </div>
+                                <span class="badge bg-primary">142 ventas</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-0">Monitor Dell 24"</h6>
+                                    <small class="text-muted">Categoría: Monitores</small>
+                                </div>
+                                <span class="badge bg-primary">98 ventas</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-0">Teclado Mecánico</h6>
+                                    <small class="text-muted">Categoría: Periféricos</small>
+                                </div>
+                                <span class="badge bg-primary">76 ventas</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-0">Mouse Inalámbrico</h6>
+                                    <small class="text-muted">Categoría: Periféricos</small>
+                                </div>
+                                <span class="badge bg-primary">65 ventas</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-0">Impresora Laser</h6>
+                                    <small class="text-muted">Categoría: Impresoras</small>
+                                </div>
+                                <span class="badge bg-primary">52 ventas</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Tablas de datos recientes -->
+        <div class="row mt-4">
+            <!-- Últimas ventas -->
+            <div class="col-lg-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">Últimas Ventas</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover recent-table">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Cliente</th>
+                                        <th>Total</th>
+                                        <th>Estado</th>
+                                        <th>Fecha</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="recent-sales-body">
+                                    <tr>
+                                        <td>#V-1001</td>
+                                        <td>Juan Pérez</td>
+                                        <td>$1,250</td>
+                                        <td><span class="badge bg-success">Completado</span></td>
+                                        <td>Hoy 10:30</td>
+                                    </tr>
+                                    <tr>
+                                        <td>#V-1002</td>
+                                        <td>María González</td>
+                                        <td>$850</td>
+                                        <td><span class="badge bg-success">Completado</span></td>
+                                        <td>Hoy 09:15</td>
+                                    </tr>
+                                    <tr>
+                                        <td>#V-1003</td>
+                                        <td>Empresa XYZ</td>
+                                        <td>$3,420</td>
+                                        <td><span class="badge bg-warning">Pendiente</span></td>
+                                        <td>Ayer 16:45</td>
+                                    </tr>
+                                    <tr>
+                                        <td>#V-1004</td>
+                                        <td>Carlos Rodríguez</td>
+                                        <td>$520</td>
+                                        <td><span class="badge bg-success">Completado</span></td>
+                                        <td>Ayer 14:20</td>
+                                    </tr>
+                                    <tr>
+                                        <td>#V-1005</td>
+                                        <td>Tienda ABC</td>
+                                        <td>$2,100</td>
+                                        <td><span class="badge bg-danger">Cancelado</span></td>
+                                        <td>20 Jun, 2023</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Últimas actividades -->
+            <div class="col-lg-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">Actividad Reciente</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="timeline">
+                            <div class="timeline-item">
+                                <div class="timeline-point"></div>
+                                <div class="timeline-content">
+                                    <div class="d-flex">
+                                        <img src="https://ui-avatars.com/api/?name=Admin&background=3498db&color=fff" class="user-avatar me-3">
+                                        <div>
+                                            <h6 class="mb-0">Administrador</h6>
+                                            <p class="mb-0">Actualizó el precio del producto "Monitor Samsung 27"</p>
+                                            <small class="text-muted">Hace 15 minutos</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="timeline-point bg-success"></div>
+                                <div class="timeline-content">
+                                    <div class="d-flex">
+                                        <img src="https://ui-avatars.com/api/?name=Vendedor&background=2ecc71&color=fff" class="user-avatar me-3">
+                                        <div>
+                                            <h6 class="mb-0">Vendedor1</h6>
+                                            <p class="mb-0">Registró una nueva venta #V-1001 por $1,250</p>
+                                            <small class="text-muted">Hace 1 hora</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="timeline-point bg-warning"></div>
+                                <div class="timeline-content">
+                                    <div class="d-flex">
+                                        <img src="https://ui-avatars.com/api/?name=Almacen&background=f39c12&color=fff" class="user-avatar me-3">
+                                        <div>
+                                            <h6 class="mb-0">Almacenista</h6>
+                                            <p class="mb-0">Actualizó el stock del producto "Teclado Mecánico"</p>
+                                            <small class="text-muted">Hace 3 horas</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="timeline-point bg-info"></div>
+                                <div class="timeline-content">
+                                    <div class="d-flex">
+                                        <img src="https://ui-avatars.com/api/?name=Admin&background=3498db&color=fff" class="user-avatar me-3">
+                                        <div>
+                                            <h6 class="mb-0">Administrador</h6>
+                                            <p class="mb-0">Agregó nuevo usuario "vendedor2" al sistema</p>
+                                            <small class="text-muted">Ayer 17:30</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

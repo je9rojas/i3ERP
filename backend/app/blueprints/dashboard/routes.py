@@ -1,48 +1,50 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
 from motor.motor_asyncio import AsyncIOMotorDatabase
 from app.core.database import get_db
 from app.blueprints.auth.services import get_current_active_user
+from typing import Dict, Any
 import logging
 
 router = APIRouter(tags=["Dashboard"])
 logger = logging.getLogger(__name__)
 
 @router.get(
-    "/data",
-    summary="Obtener datos para el dashboard",
-    responses={200: {"description": "Datos del dashboard"}}
+    "/stats",
+    summary="Obtener estadísticas para el dashboard",
+    response_model=Dict[str, Any],
+    responses={
+        200: {"description": "Datos obtenidos exitosamente"},
+        403: {"description": "Permisos insuficientes"},
+        500: {"description": "Error interno"}
+    }
 )
-async def get_dashboard_data(
+async def get_dashboard_stats(
     current_user: dict = Depends(get_current_active_user),
     db: AsyncIOMotorDatabase = Depends(get_db)
 ):
     try:
-        # Aquí iría la lógica real para obtener datos de MongoDB
-        # Estos son datos de ejemplo:
+        # Verificar permisos
+        if current_user.get("role") not in ["admin", "manager"]:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Permisos insuficientes"
+            )
+        
+        # Datos de ejemplo (reemplazar con lógica real)
         return {
-            "sales_today": 142,
-            "revenue_today": 24580,
-            "low_stock_items": 8,
-            "active_users": 42,
-            "top_products": [
-                {"name": "Laptop HP EliteBook", "category": "Computadoras", "sales": 142},
-                {"name": "Monitor Dell 24\"", "category": "Monitores", "sales": 98},
-                {"name": "Teclado Mecánico", "category": "Periféricos", "sales": 76},
-                {"name": "Mouse Inalámbrico", "category": "Periféricos", "sales": 65},
-                {"name": "Impresora Laser", "category": "Impresoras", "sales": 52}
-            ],
-            "recent_sales": [
-                {"id": "V-1001", "customer": "Juan Pérez", "amount": 1250, "status": "completed"},
-                {"id": "V-1002", "customer": "María González", "amount": 850, "status": "completed"},
-                {"id": "V-1003", "customer": "Empresa XYZ", "amount": 3420, "status": "pending"},
-                {"id": "V-1004", "customer": "Carlos Rodríguez", "amount": 520, "status": "completed"},
-                {"id": "V-1005", "customer": "Tienda ABC", "amount": 2100, "status": "cancelled"}
-            ],
-            "monthly_sales": [12000, 19000, 15000, 18000, 22000, 19500, 23000, 25000, 21000, 24000, 26000, 30000]
+            "sales_today": 42,
+            "revenue_today": 24580.75,
+            "low_stock_items": 7,
+            "active_users": 15,
+            "sales_labels": ["Ene", "Feb", "Mar", "Abr", "May", "Jun"],
+            "sales_data": [4200, 8100, 3200, 9800, 12542, 15400]
         }
+        
+    except HTTPException:
+        raise
     except Exception as e:
-        logger.error(f"Error obteniendo datos del dashboard: {str(e)}")
+        logger.error(f"🔥 Error en dashboard: {str(e)}")
         raise HTTPException(
-            status_code=500,
-            detail="Error interno al obtener datos del dashboard"
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Error interno al procesar datos"
         )

@@ -55,3 +55,7 @@ email = "admin@erp.com"
 password = "AdminERP"
 
 pip freeze > requirements.txt
+
+
+
+New-Item -Path "frontend/src/favicon.ico" -ItemType File

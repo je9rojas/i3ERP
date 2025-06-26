@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>i3ERP - Sistema de Gestión</title>
+    <link rel="stylesheet" href="/static/styles/main.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <header>
+        <div class="logo">i3ERP</div>
+        <nav>
+            <a href="/login" class="btn-login">Iniciar Sesión</a>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero">
+            <h1>{{ company.name }}</h1>
+            <div class="mission-vision">
+                <div class="card">
+                    <h2>Misión</h2>
+                    <p>{{ company.mission }}</p>
+                </div>
+                <div class="card">
+                    <h2>Visión</h2>
+                    <p>{{ company.vision }}</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2023 i3ERP Solutions</p>
+    </footer>
+
+    <script src="/static/scripts/main.js"></script>
+</body>
+</html>

@@ -3,6 +3,7 @@ from fastapi.responses import HTMLResponse, RedirectResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.middleware.cors import CORSMiddleware
+from starlette.middleware.base import BaseHTTPMiddleware
 from pathlib import Path
 import os
 import traceback
@@ -14,6 +15,27 @@ app = FastAPI(
     version="1.0.0"
 )
 
+# Middleware para caché de archivos estáticos
+class StaticCacheMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request, call_next):
+        response = await call_next(request)
+        
+        # Aplicar políticas de caché solo a archivos estáticos
+        if request.url.path.startswith(("/static", "/assets")):
+            # Archivos JS/CSS - 1 año
+            if any(request.url.path.endswith(ext) for ext in ['.js', '.css']):
+                response.headers["Cache-Control"] = "public, max-age=31536000"
+            
+            # Imágenes - 1 año
+            elif any(request.url.path.endswith(ext) for ext in ['.png', '.jpg', '.jpeg', '.gif', '.ico', '.webp']):
+                response.headers["Cache-Control"] = "public, max-age=31536000"
+            
+            # HTML - no cache
+            elif request.url.path.endswith('.html'):
+                response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+        
+        return response
+
 # Configura CORS para desarrollo
 app.add_middleware(
     CORSMiddleware,
@@ -22,6 +44,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Agregar middleware de caché
+app.add_middleware(StaticCacheMiddleware)
 
 # Obtener la ruta base del proyecto
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
@@ -101,20 +126,35 @@ async def logout():
     """Cierra la sesión del usuario (manejo real en cliente)"""
     return RedirectResponse(url="/login")
 
-# Ruta para favicon
+# Ruta para favicon - SOLUCIÓN PROFESIONAL
 @app.get("/favicon.ico", include_in_schema=False)
 async def get_favicon():
-    favicon_path = static_dir / "favicon.ico"
+    """
+    Maneja las solicitudes de favicon de manera eficiente.
+    - Primero busca en la ubicación estándar (assets/favicon.ico)
+    - Si no existe, devuelve un favicon vacío en memoria
+    - Configura cabeceras de caché adecuadas
+    """
+    # Ruta correcta del favicon
+    favicon_path = static_assets_dir / "favicon.ico"
+    
+    # Opción 1: Favicon existe - devolver con caché
     if favicon_path.exists():
-        return FileResponse(favicon_path)
+        return FileResponse(
+            favicon_path,
+            headers={"Cache-Control": "public, max-age=31536000"}  # 1 año
+        )
     
-    # Devuelve un favicon por defecto si no existe
-    default_favicon = static_assets_dir / "default-favicon.ico"
-    if default_favicon.exists():
-        return FileResponse(default_favicon)
-    
-    # Si no hay ninguno, devuelve un 404 vacío
-    return FileResponse(static_dir / "assets" / "default-favicon.ico", status_code=404)
+    # Opción 2: Favicon no existe - devolver ícono vacío en memoria
+    from fastapi.responses import Response
+    return Response(
+        content=b"",  # Contenido vacío
+        media_type="image/x-icon",
+        headers={
+            "Cache-Control": "public, max-age=3600",  # 1 hora de caché
+            "X-Content-Type-Options": "nosniff"
+        }
+    )
 
 # --- IMPORTACIÓN MANUAL DE ROUTERS ---
 try:

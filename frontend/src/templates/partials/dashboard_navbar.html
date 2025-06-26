@@ -1,0 +1,66 @@
+<!-- Barra de navegación superior -->
+<nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">
+            <i class="fas fa-cubes me-2"></i>i3ERP
+        </a>
+        
+        <div class="d-flex align-items-center">
+            <div class="dropdown me-3">
+                <a href="#" class="text-white dropdown-toggle" id="notificationsDropdown" data-bs-toggle="dropdown">
+                    <i class="fas fa-bell"></i>
+                    <span class="badge bg-danger position-absolute top-0 start-100 translate-middle p-1">3</span>
+                </a>
+                <div class="dropdown-menu dropdown-menu-end">
+                    <h6 class="dropdown-header">Notificaciones</h6>
+                    <a class="dropdown-item" href="#">
+                        <div class="d-flex">
+                            <div class="me-3">
+                                <i class="fas fa-shopping-cart text-primary"></i>
+                            </div>
+                            <div>
+                                <div>Nueva venta registrada</div>
+                                <small class="text-muted">Hace 5 minutos</small>
+                            </div>
+                        </div>
+                    </a>
+                    <a class="dropdown-item" href="#">
+                        <div class="d-flex">
+                            <div class="me-3">
+                                <i class="fas fa-user text-success"></i>
+                            </div>
+                            <div>
+                                <div>Nuevo usuario registrado</div>
+                                <small class="text-muted">Hace 2 horas</small>
+                            </div>
+                        </div>
+                    </a>
+                    <a class="dropdown-item" href="#">
+                        <div class="d-flex">
+                            <div class="me-3">
+                                <i class="fas fa-exclamation-triangle text-warning"></i>
+                            </div>
+                            <div>
+                                <div>Producto con bajo stock</div>
+                                <small class="text-muted">Hace 1 día</small>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+            
+            <div class="dropdown">
+                <a href="#" class="text-white dropdown-toggle d-flex align-items-center" id="userDropdown" data-bs-toggle="dropdown">
+                    <img src="https://ui-avatars.com/api/?name=Admin&background=3498db&color=fff" class="user-avatar me-2">
+                    <span class="user-info">Administrador</span>
+                </a>
+                <div class="dropdown-menu dropdown-menu-end">
+                    <a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i> Mi perfil</a>
+                    <a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i> Configuración</a>
+                    <div class="dropdown-divider"></div>
+                    <a class="dropdown-item" href="/logout"><i class="fas fa-sign-out-alt me-2"></i> Cerrar sesión</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
