@@ -36,13 +36,14 @@ class StaticCacheMiddleware(BaseHTTPMiddleware):
         
         return response
 
-# Configura CORS para desarrollo
+# Configuración de CORS más estricta
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["http://localhost:8000", "http://127.0.0.1:8000"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=["Authorization"]  # Exponer el header de autorización
 )
 
 # Agregar middleware de caché
@@ -77,32 +78,35 @@ print(f"✅ Assets montados desde: {assets_dir}")
 print(f"✅ Estilos montados desde: {styles_dir}")
 print(f"✅ Scripts montados desde: {scripts_dir}")
 
+# SOLUCIÓN CRÍTICA: Usar ruta absoluta para templates
+templates_dir_abs = templates_dir.resolve()
+
 # Configuración de templates
 try:
-    templates = Jinja2Templates(directory=str(templates_dir))
+    templates = Jinja2Templates(directory=str(templates_dir_abs))
     
     # Verificar existencia de plantillas críticas
     required_templates = [
         "layouts/base.html",
         "layouts/auth.html",
-        "layouts/app.html",
+        "layouts/base.html",
         "pages/auth/login.html",
         "pages/dashboard/index.html"
     ]
     
     for template in required_templates:
-        template_path = templates_dir / template
+        template_path = templates_dir_abs / template
         if not template_path.exists():
             print(f"⚠️ ERROR CRÍTICO: Plantilla {template} no encontrada en {template_path}")
         else:
             print(f"✓ Plantilla encontrada: {template}")
     
-    print(f"✅ Motor de plantillas Jinja2 configurado correctamente en: {templates_dir}")
+    print(f"✅ Motor de plantillas Jinja2 configurado correctamente en: {templates_dir_abs}")
     
 except Exception as e:
     print(f"❌ Error configurando plantillas: {e}")
-    print(f"Ruta de templates: {templates_dir}")
-    print(f"¿Existe el directorio? {os.path.exists(templates_dir)}")
+    print(f"Ruta de templates: {templates_dir_abs}")
+    print(f"¿Existe el directorio? {os.path.exists(templates_dir_abs)}")
     templates = None
 
 # Ruta principal - Página de inicio
@@ -112,6 +116,11 @@ async def home(request: Request):
         return HTMLResponse(content="<h1>Sistema en mantenimiento</h1>", status_code=500)
     
     try:
+        # Verificación adicional de la plantilla base
+        base_template = templates_dir_abs / "layouts" / "base.html"
+        if not base_template.exists():
+            return HTMLResponse(content=f"<h1>Error: Plantilla base no encontrada en {base_template}</h1>", status_code=500)
+        
         context = {
             "request": request,
             "company": {

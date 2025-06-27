@@ -463,3 +463,82 @@ MyERP/
 │       ├── versions/
 │       ├── env.py
 │       └── script.py.mako
+
+
+FINAL
+
+
+i3ERP/
+├── backend/
+│   ├── app/
+│   │   ├── blueprints/
+│   │   │   ├── auth/
+│   │   │   │   └── routes.py
+│   │   │   ├── dashboard/
+│   │   │   │   └── routes.py
+│   │   │   └── users/
+│   │   │       └── routes.py
+│   │   ├── core/
+│   │   │   ├── auth.py
+│   │   │   └── database.py
+│   │   └── main.py
+│   └── requirements.txt
+│
+└── frontend/
+    ├── public/
+    └── src/
+        ├── assets/
+        ├── scripts/
+        │   ├── core/
+        │   │   ├── api.js
+        │   │   ├── auth.js
+        │   │   └── utils.js
+        │   ├── modules/
+        │   │   └── dashboard/
+        │   │       └── dashboard.js
+        │   └── app.js
+        ├── styles/
+        └── templates/
+            ├── layouts/
+            │   └── base.html
+            └── pages/
+                ├── auth/
+                │   └── login.html
+                └── dashboard/
+                    └── index.html
+
+
+----------------------------
+
+
+backend/app/blueprints/dashboard/routes.py
+backend/app/blueprints/auth/routes.py
+
+/frontend/public/
+/frontend/src/
+/frontend/src/assets
+/frontend/src/scripts/
+/frontend/src/scripts/core/
+/frontend/src/scripts/core/api.js
+/frontend/src/scripts/core/auth.js
+/frontend/src/scripts/core/utils.js
+/frontend/src/scripts/modules/
+/frontend/src/scripts/modules/dashboard/
+/frontend/src/scripts/modules/dashboard/dashboard.js
+/frontend/src/scripts/app.js
+
+
+/frontend/src/styles/
+
+/frontend/src/templates/
+/frontend/src/templates/layouts/
+/frontend/src/templates/layouts/base.html
+/frontend/src/templates/pages/
+/frontend/src/templates/pages/auth/
+/frontend/src/templates/pages/auth/login.html
+/frontend/src/templates/pages/dashboard/index.html
+
+
+
+-----------------
+

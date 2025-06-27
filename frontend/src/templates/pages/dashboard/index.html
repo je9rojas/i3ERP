@@ -1,4 +1,4 @@
-{% extends "layouts/app.html" %}
+{% extends "layouts/base.html" %}
 
 {% block title %}Dashboard | i3ERP{% endblock %}
 
@@ -8,24 +8,36 @@
 {% endblock %}
 
 {% block content %}
-<main>
-    <section class="hero">
-        <h1>i3ERP Solutions</h1>
-        <div class="mission-vision">
-            <div class="card">
-                <h2>Misión</h2>
-                <p>Proporcionar soluciones ERP de clase mundial para empresas de todos los tamaños.</p>
-            </div>
-            <div class="card">
-                <h2>Visión</h2>
-                <p>Ser el ERP más innovador y confiable del mercado.</p>
-            </div>
-        </div>
-    </section>
+<main class="dashboard-page">
+  <header>
+    <h1>Panel de Control</h1>
+    <button id="logout-btn" class="btn-logout">Cerrar Sesión</button>
+  </header>
+  
+  <div id="dashboard-error" class="error-message"></div>
+  
+  <!-- Sección de estadísticas - Asegurar IDs correctos -->
+  <section class="dashboard-stats">
+    <div class="stat-card">
+      <h3>Ventas Hoy</h3>
+      <p id="sales-today">Cargando...</p>
+    </div>
+    <div class="stat-card">
+      <h3>Ingresos Hoy</h3>
+      <p id="revenue-today">Cargando...</p>
+    </div>
+    <div class="stat-card">
+      <h3>Productos con Bajo Stock</h3>
+      <p id="low-stock-items">Cargando...</p>
+    </div>
+    <div class="stat-card">
+      <h3>Usuarios Activos</h3>
+      <p id="active-users">Cargando...</p>
+    </div>
+  </section>
 </main>
 {% endblock %}
 
 {% block scripts %}
-<script src="/scripts/app.js"></script>
-<script src="/scripts/modules/dashboard/dashboard.js"></script>
+<script type="module" src="/scripts/modules/dashboard/dashboard.js"></script>
 {% endblock %}

@@ -62,3 +62,8 @@ New-Item -Path "frontend/src/favicon.ico" -ItemType File
 
 <link rel="stylesheet" href="/static/css/styles.css">
 <script src="/static/js/app.js"></script>
+
+
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000 --log-level debug --app-dir backend
+
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000 --log-level debug --app-dir backend

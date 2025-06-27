@@ -1,35 +1,46 @@
-// Servicio de autenticación
-import { api } from './api.js';
-
 export class AuthService {
-  static async login(email, password) {
+  static getToken() {
+    return localStorage.getItem('auth_token');
+  }
+
+  static isAuthenticated() {
+    return !!this.getToken();
+  }
+
+  static redirectToLogin() {
+    window.location.href = '/login';
+  }
+
+  static async login(username, password) {
     try {
-      const response = await api.post('/api/auth/token', {
-        username: email,
-        password: password
+      const response = await fetch('/api/auth/token', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: new URLSearchParams({
+          username,
+          password,
+          grant_type: 'password'
+        })
       });
-      
-      if (response.access_token) {
-        localStorage.setItem('auth_token', response.access_token);
-        return true;
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || 'Credenciales inválidas');
       }
-      return false;
+
+      const data = await response.json();
+      localStorage.setItem('auth_token', data.access_token);
+      return true;
     } catch (error) {
       console.error('Login error:', error);
-      return false;
+      throw error;
     }
   }
 
   static logout() {
     localStorage.removeItem('auth_token');
     window.location.href = '/login';
-  }
-
-  static isAuthenticated() {
-    return !!localStorage.getItem('auth_token');
-  }
-
-  static getToken() {
-    return localStorage.getItem('auth_token');
   }
 }
